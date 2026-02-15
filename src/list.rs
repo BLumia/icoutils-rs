@@ -170,7 +170,9 @@ mod tests {
             alpha_threshold: 127,
             icon_only: false,
             cursor_only: false,
+            compat_png_bitcount: true,
             files: vec![],
+            create_inputs: vec![],
         };
 
         let (matched, lines) = list_from_bytes(&bytes, &args).unwrap();

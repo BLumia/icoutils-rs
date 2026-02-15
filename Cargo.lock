@@ -65,10 +65,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "icotool"
+name = "icoutils-rs"
 version = "0.1.0"
 dependencies = [
  "ico",
+ "png",
 ]
 
 [[package]]

@@ -1,4 +1,4 @@
-use crate::types::{Action, Command, ParsedArgs};
+use crate::types::{Action, Command, CreateInput, ParsedArgs};
 
 pub fn parse_args(argv: &[String]) -> Result<(Action, Option<ParsedArgs>), String> {
     let mut command: Option<Command> = None;
@@ -16,20 +16,38 @@ pub fn parse_args(argv: &[String]) -> Result<(Action, Option<ParsedArgs>), Strin
     let mut alpha_threshold: i32 = 127;
     let mut icon_only = false;
     let mut cursor_only = false;
+    let mut compat_png_bitcount = true;
 
     let mut files: Vec<String> = Vec::new();
+    let mut create_inputs: Vec<CreateInput> = Vec::new();
 
     let mut i = 0usize;
     while i < argv.len() {
         let arg = &argv[i];
 
         if arg == "--" {
-            files.extend_from_slice(&argv[i + 1..]);
+            for p in &argv[i + 1..] {
+                files.push(p.clone());
+                create_inputs.push(CreateInput {
+                    path: p.clone(),
+                    raw_png: false,
+                    min_bit_depth: bit_depth,
+                    hotspot_x,
+                    hotspot_y,
+                });
+            }
             break;
         }
 
         if arg == "-" || !arg.starts_with('-') {
             files.push(arg.clone());
+            create_inputs.push(CreateInput {
+                path: arg.clone(),
+                raw_png: false,
+                min_bit_depth: bit_depth,
+                hotspot_x,
+                hotspot_y,
+            });
             i += 1;
             continue;
         }
@@ -78,8 +96,16 @@ pub fn parse_args(argv: &[String]) -> Result<(Action, Option<ParsedArgs>), Strin
                         take_value(value, argv, &mut i, "--alpha-threshold")?,
                     )?
                 }
+                "no-compat-png-bitcount" => compat_png_bitcount = false,
                 "raw" => {
-                    let _ = take_value(value, argv, &mut i, "--raw")?;
+                    let raw_path = take_value(value, argv, &mut i, "--raw")?;
+                    create_inputs.push(CreateInput {
+                        path: raw_path,
+                        raw_png: true,
+                        min_bit_depth: bit_depth,
+                        hotspot_x,
+                        hotspot_y,
+                    });
                 }
                 _ => return Err(format!("unrecognized option '--{name}'")),
             }
@@ -138,7 +164,14 @@ pub fn parse_args(argv: &[String]) -> Result<(Action, Option<ParsedArgs>), Strin
                     )?
                 }
                 'r' => {
-                    let _ = take_short_value(&mut chars, argv, &mut i, "-r")?;
+                    let raw_path = take_short_value(&mut chars, argv, &mut i, "-r")?;
+                    create_inputs.push(CreateInput {
+                        path: raw_path,
+                        raw_png: true,
+                        min_bit_depth: bit_depth,
+                        hotspot_x,
+                        hotspot_y,
+                    });
                 }
                 _ => return Err(format!("invalid option -- '{ch}'")),
             }
@@ -172,7 +205,9 @@ pub fn parse_args(argv: &[String]) -> Result<(Action, Option<ParsedArgs>), Strin
             alpha_threshold,
             icon_only,
             cursor_only,
+            compat_png_bitcount,
             files,
+            create_inputs,
         }),
     ))
 }
@@ -201,6 +236,7 @@ pub fn print_help(program_name: &str) {
                                transparent image portions (default is 127)"
     );
     println!("  -r, --raw=FILENAME           store input file as raw PNG (\"Vista icons\")");
+    println!("      --no-compat-png-bitcount write PNG entry bit count from IHDR");
     println!("      --icon                   match icons only");
     println!("      --cursor                 match cursors only");
     println!("  -o, --output=PATH            where to place extracted files");

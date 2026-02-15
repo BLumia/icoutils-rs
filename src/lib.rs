@@ -1,4 +1,5 @@
 pub mod cli;
+pub mod create;
 pub mod input;
 pub mod list;
 pub mod parse;
@@ -41,7 +42,8 @@ pub fn run_from_args(program_path: &str, argv: &[String]) -> i32 {
 fn run(program_name: String, args: types::ParsedArgs) -> i32 {
     match args.command {
         Command::List => list::run_list(&args),
-        Command::Extract | Command::Create => {
+        Command::Create => create::run_create(&args),
+        Command::Extract => {
             eprintln!("{program_name}: not implemented yet");
             1
         }

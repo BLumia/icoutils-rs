@@ -6,6 +6,15 @@ pub enum Command {
 }
 
 #[derive(Clone, Debug)]
+pub struct CreateInput {
+    pub path: String,
+    pub raw_png: bool,
+    pub min_bit_depth: i32,
+    pub hotspot_x: i32,
+    pub hotspot_y: i32,
+}
+
+#[derive(Clone, Debug)]
 #[allow(dead_code)]
 pub struct ParsedArgs {
     pub command: Command,
@@ -23,8 +32,10 @@ pub struct ParsedArgs {
     pub alpha_threshold: i32,
     pub icon_only: bool,
     pub cursor_only: bool,
+    pub compat_png_bitcount: bool,
 
     pub files: Vec<String>,
+    pub create_inputs: Vec<CreateInput>,
 }
 
 #[derive(Clone, Debug)]

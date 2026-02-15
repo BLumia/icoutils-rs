@@ -1,7 +1,12 @@
 [package]
-name = "icotool"
+name = "icoutils-rs"
 version = "0.1.0"
 edition = "2024"
 
+[[bin]]
+name = "icotool"
+path = "src/main.rs"
+
 [dependencies]
 ico = "0.5"
+png = "0.17"
