@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 (c) Gary "BLumia" Wang <opensource@blumia.net>
+//
+// SPDX-License-Identifier: MIT
+
 use crate::{
     input::read_input,
     parse::{parse_dib_info, parse_png_info},

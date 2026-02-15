@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 (c) Gary "BLumia" Wang <opensource@blumia.net>
+//
+// SPDX-License-Identifier: MIT
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Command {
     Extract,

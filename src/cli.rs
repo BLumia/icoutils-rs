@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 (c) Gary "BLumia" Wang <opensource@blumia.net>
+//
+// SPDX-License-Identifier: MIT
+
 use crate::types::{Action, Command, CreateInput, ParsedArgs};
 
 pub fn parse_args(argv: &[String]) -> Result<(Action, Option<ParsedArgs>), String> {

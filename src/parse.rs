@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 (c) Gary "BLumia" Wang <opensource@blumia.net>
+//
+// SPDX-License-Identifier: MIT
+
 pub fn parse_png_info(data: &[u8]) -> Result<(u32, u32, u32), String> {
     const SIG: [u8; 8] = [137, 80, 78, 71, 13, 10, 26, 10];
     if data.len() < SIG.len() || data[..SIG.len()] != SIG {

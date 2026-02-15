@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 (c) Gary "BLumia" Wang <opensource@blumia.net>
+//
+// SPDX-License-Identifier: MIT
+
 pub mod cli;
 pub mod create;
 pub mod input;
