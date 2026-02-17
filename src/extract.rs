@@ -247,7 +247,9 @@ mod tests {
         let name = gen_extract_name("a/b/c.ico", None, &meta);
         assert_eq!(name, "c_1_1x1x32.png");
         let name2 = gen_extract_name(r"a\b\c.CUR", Some("outdir"), &meta);
-        assert!(name2.ends_with(r"outdir\c_1_1x1x32.png"));
+        let path2 = std::path::Path::new(&name2);
+        assert_eq!(path2.file_name().unwrap(), "c_1_1x1x32.png");
+        assert!(path2.parent().unwrap().ends_with("outdir"));
 
         let data = icon_dir.entries()[0].data();
         assert_eq!(data, png_bytes.as_slice());
