@@ -103,6 +103,7 @@ pub fn parse_args(argv: &[String]) -> Result<(Action, Option<ParsedArgs>), Strin
                 "no-compat-png-bitcount" => compat_png_bitcount = false,
                 "raw" => {
                     let raw_path = take_value(value, argv, &mut i, "--raw")?;
+                    files.push(raw_path.clone());
                     create_inputs.push(CreateInput {
                         path: raw_path,
                         raw_png: true,
@@ -169,6 +170,7 @@ pub fn parse_args(argv: &[String]) -> Result<(Action, Option<ParsedArgs>), Strin
                 }
                 'r' => {
                     let raw_path = take_short_value(&mut chars, argv, &mut i, "-r")?;
+                    files.push(raw_path.clone());
                     create_inputs.push(CreateInput {
                         path: raw_path,
                         raw_png: true,
