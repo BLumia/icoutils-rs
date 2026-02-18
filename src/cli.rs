@@ -250,7 +250,7 @@ pub fn print_help(program_name: &str) {
 }
 
 pub fn print_version(program_name: &str) {
-    println!("{program_name} 0.1.0");
+    println!("{program_name} {}", env!("CARGO_PKG_VERSION"));
 }
 
 fn set_command(slot: &mut Option<Command>, cmd: Command) -> Result<(), String> {
