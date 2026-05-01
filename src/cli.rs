@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 use crate::types::{Action, Command, CreateInput, ParsedArgs};
+use crate::util;
 
 pub fn parse_args(argv: &[String]) -> Result<(Action, Option<ParsedArgs>), String> {
     let mut command: Option<Command> = None;
@@ -57,52 +58,69 @@ pub fn parse_args(argv: &[String]) -> Result<(Action, Option<ParsedArgs>), Strin
         }
 
         if let Some(stripped) = arg.strip_prefix("--") {
-            let (name, value) = split_long(stripped);
+            let (name, value) = util::split_long(stripped);
             match name {
                 "help" => return Ok((Action::Help, None)),
                 "version" => return Ok((Action::Version, None)),
-                "extract" => set_command(&mut command, Command::Extract)?,
-                "list" => set_command(&mut command, Command::List)?,
-                "create" => set_command(&mut command, Command::Create)?,
+                "extract" => util::set_command(&mut command, Command::Extract)?,
+                "list" => util::set_command(&mut command, Command::List)?,
+                "create" => util::set_command(&mut command, Command::Create)?,
                 "icon" => icon_only = true,
                 "cursor" => cursor_only = true,
-                "output" => output = Some(take_value(value, argv, &mut i, "--output")?),
+                "output" => output = Some(util::take_value(value, argv, &mut i, "--output")?),
                 "index" => {
-                    image_index = parse_i32("index", take_value(value, argv, &mut i, "--index")?)?
+                    image_index = util::parse_i32(
+                        "index",
+                        &util::take_value(value, argv, &mut i, "--index")?,
+                    )?
                 }
-                "width" => width = parse_i32("width", take_value(value, argv, &mut i, "--width")?)?,
+                "width" => {
+                    width = util::parse_i32(
+                        "width",
+                        &util::take_value(value, argv, &mut i, "--width")?,
+                    )?
+                }
                 "height" => {
-                    height = parse_i32("height", take_value(value, argv, &mut i, "--height")?)?
+                    height = util::parse_i32(
+                        "height",
+                        &util::take_value(value, argv, &mut i, "--height")?,
+                    )?
                 }
                 "palette-size" => {
-                    palette_size = parse_i32(
+                    palette_size = util::parse_i32(
                         "palette-size",
-                        take_value(value, argv, &mut i, "--palette-size")?,
+                        &util::take_value(value, argv, &mut i, "--palette-size")?,
                     )?
                 }
                 "bit-depth" => {
-                    bit_depth =
-                        parse_i32("bit-depth", take_value(value, argv, &mut i, "--bit-depth")?)?
+                    bit_depth = util::parse_i32(
+                        "bit-depth",
+                        &util::take_value(value, argv, &mut i, "--bit-depth")?,
+                    )?
                 }
                 "hotspot-x" => {
-                    hotspot_x =
-                        parse_i32("hotspot-x", take_value(value, argv, &mut i, "--hotspot-x")?)?;
+                    hotspot_x = util::parse_i32(
+                        "hotspot-x",
+                        &util::take_value(value, argv, &mut i, "--hotspot-x")?,
+                    )?;
                     hotspot_x_set = true;
                 }
                 "hotspot-y" => {
-                    hotspot_y =
-                        parse_i32("hotspot-y", take_value(value, argv, &mut i, "--hotspot-y")?)?;
+                    hotspot_y = util::parse_i32(
+                        "hotspot-y",
+                        &util::take_value(value, argv, &mut i, "--hotspot-y")?,
+                    )?;
                     hotspot_y_set = true;
                 }
                 "alpha-threshold" => {
-                    alpha_threshold = parse_i32(
+                    alpha_threshold = util::parse_i32(
                         "alpha-threshold",
-                        take_value(value, argv, &mut i, "--alpha-threshold")?,
+                        &util::take_value(value, argv, &mut i, "--alpha-threshold")?,
                     )?
                 }
                 "no-compat-png-bitcount" => compat_png_bitcount = false,
                 "raw" => {
-                    let raw_path = take_value(value, argv, &mut i, "--raw")?;
+                    let raw_path = util::take_value(value, argv, &mut i, "--raw")?;
                     files.push(raw_path.clone());
                     create_inputs.push(CreateInput {
                         path: raw_path,
@@ -122,54 +140,62 @@ pub fn parse_args(argv: &[String]) -> Result<(Action, Option<ParsedArgs>), Strin
         let mut chars = arg[1..].chars().peekable();
         while let Some(ch) = chars.next() {
             match ch {
-                'x' => set_command(&mut command, Command::Extract)?,
-                'l' => set_command(&mut command, Command::List)?,
-                'c' => set_command(&mut command, Command::Create)?,
-                'o' => output = Some(take_short_value(&mut chars, argv, &mut i, "-o")?),
+                'x' => util::set_command(&mut command, Command::Extract)?,
+                'l' => util::set_command(&mut command, Command::List)?,
+                'c' => util::set_command(&mut command, Command::Create)?,
+                'o' => output = Some(util::take_short_value(&mut chars, argv, &mut i, "-o")?),
                 'i' => {
-                    image_index =
-                        parse_i32("index", take_short_value(&mut chars, argv, &mut i, "-i")?)?
+                    image_index = util::parse_i32(
+                        "index",
+                        &util::take_short_value(&mut chars, argv, &mut i, "-i")?,
+                    )?
                 }
                 'w' => {
-                    width = parse_i32("width", take_short_value(&mut chars, argv, &mut i, "-w")?)?
+                    width = util::parse_i32(
+                        "width",
+                        &util::take_short_value(&mut chars, argv, &mut i, "-w")?,
+                    )?
                 }
                 'h' => {
-                    height = parse_i32("height", take_short_value(&mut chars, argv, &mut i, "-h")?)?
+                    height = util::parse_i32(
+                        "height",
+                        &util::take_short_value(&mut chars, argv, &mut i, "-h")?,
+                    )?
                 }
                 'p' => {
-                    palette_size = parse_i32(
+                    palette_size = util::parse_i32(
                         "palette-size",
-                        take_short_value(&mut chars, argv, &mut i, "-p")?,
+                        &util::take_short_value(&mut chars, argv, &mut i, "-p")?,
                     )?
                 }
                 'b' => {
-                    bit_depth = parse_i32(
+                    bit_depth = util::parse_i32(
                         "bit-depth",
-                        take_short_value(&mut chars, argv, &mut i, "-b")?,
+                        &util::take_short_value(&mut chars, argv, &mut i, "-b")?,
                     )?
                 }
                 'X' => {
-                    hotspot_x = parse_i32(
+                    hotspot_x = util::parse_i32(
                         "hotspot-x",
-                        take_short_value(&mut chars, argv, &mut i, "-X")?,
+                        &util::take_short_value(&mut chars, argv, &mut i, "-X")?,
                     )?;
                     hotspot_x_set = true;
                 }
                 'Y' => {
-                    hotspot_y = parse_i32(
+                    hotspot_y = util::parse_i32(
                         "hotspot-y",
-                        take_short_value(&mut chars, argv, &mut i, "-Y")?,
+                        &util::take_short_value(&mut chars, argv, &mut i, "-Y")?,
                     )?;
                     hotspot_y_set = true;
                 }
                 't' => {
-                    alpha_threshold = parse_i32(
+                    alpha_threshold = util::parse_i32(
                         "alpha-threshold",
-                        take_short_value(&mut chars, argv, &mut i, "-t")?,
+                        &util::take_short_value(&mut chars, argv, &mut i, "-t")?,
                     )?
                 }
                 'r' => {
-                    let raw_path = take_short_value(&mut chars, argv, &mut i, "-r")?;
+                    let raw_path = util::take_short_value(&mut chars, argv, &mut i, "-r")?;
                     files.push(raw_path.clone());
                     create_inputs.push(CreateInput {
                         path: raw_path,
@@ -251,65 +277,4 @@ pub fn print_help(program_name: &str) {
 
 pub fn print_version(program_name: &str) {
     println!("{program_name} {}", env!("CARGO_PKG_VERSION"));
-}
-
-fn set_command(slot: &mut Option<Command>, cmd: Command) -> Result<(), String> {
-    if let Some(existing) = slot {
-        if *existing != cmd {
-            return Err("multiple commands specified".to_string());
-        }
-        return Ok(());
-    }
-    *slot = Some(cmd);
-    Ok(())
-}
-
-fn split_long(s: &str) -> (&str, Option<&str>) {
-    match s.split_once('=') {
-        Some((k, v)) => (k, Some(v)),
-        None => (s, None),
-    }
-}
-
-fn take_value(
-    value: Option<&str>,
-    argv: &[String],
-    i: &mut usize,
-    opt: &str,
-) -> Result<String, String> {
-    if let Some(v) = value {
-        return Ok(v.to_string());
-    }
-    let next = argv
-        .get(*i + 1)
-        .ok_or_else(|| format!("option '{opt}' requires an argument"))?;
-    *i += 1;
-    Ok(next.clone())
-}
-
-fn take_short_value(
-    chars: &mut std::iter::Peekable<std::str::Chars<'_>>,
-    argv: &[String],
-    i: &mut usize,
-    opt: &str,
-) -> Result<String, String> {
-    if chars.peek().is_some() {
-        let rest: String = chars.collect();
-        return Ok(rest);
-    }
-    let next = argv
-        .get(*i + 1)
-        .ok_or_else(|| format!("option '{opt}' requires an argument"))?;
-    *i += 1;
-    Ok(next.clone())
-}
-
-fn parse_i32(field: &str, value: String) -> Result<i32, String> {
-    let n: i32 = value
-        .parse()
-        .map_err(|_| format!("invalid {field} value: {value}"))?;
-    if n < 0 {
-        return Err(format!("invalid {field} value: {value}"));
-    }
-    Ok(n)
 }
